@@ -1,18 +1,25 @@
 from shapely.geometry import Point, LinearRing, LineString, Polygon
 from Problem import Problem
+import random
 
-class Data:
+class ProblemManager:
     def __init__(self):
         self.problems = []
         
-    def readData(self):
-        letters = ['A', 'B', 'C', 'D', 'E', 'F', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
+    def returnNProblems(self, numb, nume):
+        returnProblems = []
+        for i in range(numb, nume):
+            returnProblems.append(self.problems[i])
+            
+        return returnProblems
+        
+    def constructProblems(self):
+        letters = ['A', 'B', 'F', 'L', 'C', 'D', 'E', 'H', 'I', 'J', 'K', 'M', 'N', 'O', 'P', 'Q', 'R']
         for l in letters:
-            current_problems = self.readDataHelper(l)
+            current_problems = self.readData(l)
             self.problems = self.problems + current_problems
             
-           
-    def readDataHelper(self,letter):
+    def readData(self,letter):
         current_problems = []
         filenameData = 'Data/T' + letter
         filenameOptimal = 'Data/OpT' + letter
@@ -29,7 +36,6 @@ class Data:
             self.solution_shapes = []
             self.objects_solution_size = 0
             self.object_arrangements = []
-            
             int_countval = i
             string_countval = str(int_countval)
             string_countval = string_countval.zfill(3)
@@ -43,15 +49,11 @@ class Data:
             count = 0
             for line in Lines: #for each problem do the below
                 count += 1
-                
-                
-                if count == 1: #first line of file
+                if count == 1: 
                     self.num_shapes = int(line.strip())
-                    
-                elif count == 2: #size of objects
+                elif count == 2: 
                     points = line.split()
                     self.objects_size = int(points[0]) * int(points[1])
-                
                 else:
                     points = line.split()
                     points.pop(0)
@@ -62,20 +64,16 @@ class Data:
                         p = p + 2
                     self.shapes.append(Polygon(pointsArray))
             
-             
-            
-            
             count = 0
             self.object_arrangements = []
             for line in Lines2: #for each solution do the below
                 count += 1
-            
-                if count == 1: #first line of file
+                if count == 1: 
                     line1 = line.split()
                     self.num_objects = int(line1.pop(0))
                     self.object_arrangements = line1
                     
-                elif count == 2: #size of objects
+                elif count == 2: 
                     points = line.split()
                     self.objects_solution_size = int(points[0]) * int(points[1])
                 
@@ -87,8 +85,7 @@ class Data:
                     while p < len(points):
                         pointsArray.append(Point(int(points[p]),int(points[p+1])))
                         p = p + 2
-                    
-                  
+                        
                     self.solution_shapes.append(Polygon(pointsArray))
             
             num = 0
@@ -96,20 +93,14 @@ class Data:
             total_area = 0
             for a in self.object_arrangements: #Go through each arrangement and get area
                 current_area = 0
-
                 for n in range(0, int(a)):
                     current_area = current_area + self.solution_shapes[num].area
                     num = num + 1
-                    
                 total_area = total_area + ( current_area / self.objects_solution_size)
                 
-            
             current_fit = total_area
-           
             current_fit = (current_fit) / self.num_objects
-                
             current_problems.append(Problem(self.num_shapes, self.shapes, self.objects_size, current_fit))    
-
         return current_problems      
                    
                     
