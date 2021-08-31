@@ -45,12 +45,17 @@ class Chromosome:
                         break
                 
                 problem_solved =  len(self.problems[p].shapes) == 0
-                # print('\n' + str(problem_solved) + '\n')
-                # print("OBJECTS USED")
-                # print(self.problems[p].used_objects)
-                # for o in self.problems[p].used_objects:
-                #     print("---")
-                #     print(o.shapes)  
+                print('\n' + str(problem_solved) + '\n')
+                print("\nOBJECTS USED")
+                print(self.problems[p].used_objects)
+                for o in self.problems[p].used_objects:
+                    print("---")
+                    print(len(o.shapes))
+                    print(o.shapes)  
+                    for s in o.shapes:
+                        print(list(s.exterior.coords))
+                    print("---")
+                print('\n')
             
   
         
