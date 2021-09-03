@@ -9,9 +9,11 @@ class ProblemManager:
     def returnNProblems(self, numb, nume):
         returnProblems = []
         for i in range(numb, nume):
-            returnProblems.append(self.problems[i])
+            copy_prob = self.problems[i].copy()
+            returnProblems.append(copy_prob)
             
-        return returnProblems
+        
+        return returnProblems.copy()
         
     def constructProblems(self):
         letters = ['A', 'B', 'F', 'L', 'C', 'D', 'E', 'H', 'I', 'J', 'K', 'M', 'N', 'O', 'P', 'Q', 'R']

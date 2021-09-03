@@ -20,7 +20,12 @@ class SelectionHeuristic:
         elif id == 3: # Filler + FFD. This places as many pieces as possible within the open objects. If at least one piece has been placed, the algorithm stops. The FFD algorithm is applied, otherwise
             return problem.shapes.pop(0)
         else: # Worst Fit (WF). It places the item in the opened object where it worst fits (that is, with the largest available room).
-            return problem.shapes.pop(0)
+            # print("............................ Worst Fit (WF) .......................")
+            # print(len(problem.shapes))
+            ret_shape = problem.shapes.pop(0)
+            problem.shapes.append(ret_shape)
+            # print(len(problem.shapes))
+            return ret_shape
             
             
    

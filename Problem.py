@@ -9,3 +9,14 @@ class Problem:
         self.solution_fitness = solution_fitness
         self.used = False
         self.used_objects = []
+        
+    def copy(self):
+        new_shapes = []
+        
+        for s in self.shapes:
+            new_shape = Polygon(s)
+            new_shapes.append(new_shape)
+            
+        new_obj = Object(1000, 1000)
+        problem_copy = Problem(self.num_shapes, new_shapes, 1000*1000, self.solution_fitness)
+        return problem_copy
