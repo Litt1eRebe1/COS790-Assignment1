@@ -108,7 +108,8 @@ class Population:
         if self.best_fitness > self.individuals[0].fitness:
             self.best_fitness = self.individuals[0].fitness
             self.best_individual = self.individuals[0].copy()
-            print("BEST FITNESS: " + str(self.individuals[0].fitness))
+
+        print("BEST FITNESS: " + str(self.individuals[0].fitness))
         
         
         # for o in self.individuals[0].problems:
@@ -132,9 +133,11 @@ class Population:
         print("testing pop")
     
         print("BEST FITNESS: " + str(self.best_individual.fitness))
-        print("used objects: " + str(len(self.best_individual.used_objects)))
-        for o in self.best_individual.used_objects:
-            print(o.shapes)
+        
+        for p in self.best_individual.problems:
+            print("used objects: " + str(len(self.best_individual.used_objects)))
+            for o in p.used_objects:
+                print(o.shapes)
         
         
     def createNewPopulation(self, num_gen = 1):
