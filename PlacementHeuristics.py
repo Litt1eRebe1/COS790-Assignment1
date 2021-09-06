@@ -12,7 +12,7 @@ class PlacementHeuristics:
         random.seed(self.seed)  #random.random()
         
     def applyHeuristic(self, problem, selection_heuristic):
-     
+
         id = self.id
         if id > 2:
             id = 1
@@ -79,7 +79,7 @@ class PlacementHeuristics:
             if id == 0: #  Bottom-Left (BLI).  The piece starts at the top right corner of
          
                 while len(problem.shapes) > 0:
-                    
+                
                     shape = self.selection_heuristic.applyHeuristic(problem)
                     for o in range(0, len(problem.used_objects)):
                         placed = self.placeShapeInObjectBLI(shape, problem.used_objects[o], problem)
@@ -110,7 +110,7 @@ class PlacementHeuristics:
                 #         placed = self.placeShapeInObjectCA(shape, use_object, problem)
                 
                 while len(problem.shapes) > 0:
-                    
+                  
                     shape = self.selection_heuristic.applyHeuristic(problem)
                     for o in range(0, len(problem.used_objects)):
                         placed = self.placeShapeInObjectBLI(shape, problem.used_objects[o], problem)
@@ -166,8 +166,9 @@ class PlacementHeuristics:
                         worst_area = used_area
                         
                 
-                self.removeShapeFromProblem(worst_shape, problem)
-                use_object.shapes.append(worst_shape)
+                if worst_shape != None:
+                    self.removeShapeFromProblem(worst_shape, problem)
+                    use_object.shapes.append(worst_shape)
           
             elif id == 1: # Constructive Approach (CA)
            
@@ -204,11 +205,11 @@ class PlacementHeuristics:
     
     def removeShapeFromProblem(self, shape,problem):
         temp_shapes = []
-     
-        for s in problem.shapes:
-            if shape.equals(s) == False:
-                temp_shapes.append(s)
-        problem.shapes = temp_shapes
+        if shape != None:
+            for s in problem.shapes:
+                if shape.equals(s) == False:
+                    temp_shapes.append(s)
+            problem.shapes = temp_shapes
    
     
     def placeShapeInObjectBLITemp(self, shape, object_p, problem):
@@ -291,7 +292,9 @@ class PlacementHeuristics:
         
             #find lowest point of shape
             lowest_point = [shape.bounds[0], shape.bounds[1]]
-
+            
+            
+            
             
             accept = False
             small_point = []
@@ -302,6 +305,7 @@ class PlacementHeuristics:
                     break
                     
                 point_to_move_to = p
+                
                 
                 if lowest_point[0] > point_to_move_to[0]: #needs to move down
                     distance = point_to_move_to[0] - lowest_point[0]
@@ -337,35 +341,37 @@ class PlacementHeuristics:
         
             place_true = self.legalPlacement(shape, object)
             point_to_move_to = small_point
-           
-            placed = False
-            if place_true == True:
-                if lowest_point[0] > point_to_move_to[0]: #needs to move down
-                    distance = point_to_move_to[0] - lowest_point[0]
-                    for r in range(0, int(distance) - 1):
-                        shape = self.moveDown(shape)
-                else: #needs to move up
-                    distance = point_to_move_to[0] - lowest_point[0]
-                    for r in range(0, int(distance) - 1):
-                        shape = self.moveUp(shape)
-                
-                if lowest_point[1] > point_to_move_to[1]: #needs to move left
-                    distance = point_to_move_to[1] - lowest_point[1]
-                    for r in range(0, int(distance) - 1):
-                        shape = self.moveLeft(shape)
-                else: #needs to move right
-                    distance = point_to_move_to[1] - lowest_point[1]
-                    for r in range(0, int(distance) - 1):
-                        shape = self.moveRight(shape)
-                accept = True
-                    
-                place_true = self.legalPlacement(shape, object)       
 
-                if not place_true:
-                    accept = False 
-                else:
-                    object.shapes.append(shape)
-                    placed = True
+            if len(point_to_move_to) > 0:
+               
+                placed = False
+                if place_true == True:
+                    if lowest_point[0] > point_to_move_to[0]: #needs to move down
+                        distance = point_to_move_to[0] - lowest_point[0]
+                        for r in range(0, int(distance) - 1):
+                            shape = self.moveDown(shape)
+                    else: #needs to move up
+                        distance = point_to_move_to[0] - lowest_point[0]
+                        for r in range(0, int(distance) - 1):
+                            shape = self.moveUp(shape)
+                    
+                    if lowest_point[1] > point_to_move_to[1]: #needs to move left
+                        distance = point_to_move_to[1] - lowest_point[1]
+                        for r in range(0, int(distance) - 1):
+                            shape = self.moveLeft(shape)
+                    else: #needs to move right
+                        distance = point_to_move_to[1] - lowest_point[1]
+                        for r in range(0, int(distance) - 1):
+                            shape = self.moveRight(shape)
+                    accept = True
+                        
+                    place_true = self.legalPlacement(shape, object)       
+
+                    if not place_true:
+                        accept = False 
+                    else:
+                        object.shapes.append(shape)
+                        placed = True
         return placed 
         
     

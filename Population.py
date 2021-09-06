@@ -7,9 +7,11 @@ import multiprocessing
 from pathos.multiprocessing import ProcessingPool as Pool
 
 class Population:
-    def __init__(self, ps, seed, max_len, tournament_s = 3):
+    def __init__(self, ps, seed, max_len, tournament_s = 7):
         self.tournament_size = tournament_s
         self.seed = seed
+        self.best_fitness = 1
+        self.best_individual = None
         self.manager = ProblemManager()
         self.manager.constructProblems() 
         self.max_chromosome_length = max_len
@@ -44,14 +46,15 @@ class Population:
         elif choice < 60:
             parents = self.tournamentSelection(2)
             new_individuals = parents[0].crossover2(parents[1])
-        elif choice < 74:
+        elif choice < 80:
             parents = self.tournamentSelection(1)
             new_individuals = parents[0].mutate1()
         elif choice < 88:
+            parents = self.tournamentSelection(1)
             new_individuals = parents[0].mutate2()
         else:
             parents = self.tournamentSelection(1)
-            new_individuals = [parent[0].copy()]
+            new_individuals = [parents[0].copy()]
             
         return new_individuals
 
@@ -62,77 +65,81 @@ class Population:
         
         for i in range(0, self.tournament_size):
             index = self.getRandomInt(0, len(self.individuals) - 1)
-            selection_pool.append(self.individuals[index])
+         
+            selection_pool.append(self.individuals[index].copy())
         
         selection_pool.sort(key=lambda x: x.fitness, reverse=False)
         
         for i in range(0, num_parents_p):
             parents.append(selection_pool.pop(0))
         
-    
-        for p in parents:
-            print(p.fitness)
+        # print("TOURNAMENT PARENT SELECTION FItnESSES")
+        # for p in parents:
+        #     print(p.fitness)
         return parents
     
     
             
     def getRandomInt(self, a, b):
+        self.seed = self.seed + 1
+        random.seed(self.seed)  #random.random()
         rand_int =  randint(a, b)
         return rand_int
     
     def evaluateHelper(self, individual):
         
-        individual.evaluateChromosome()
+        individual.evaluateChromosome(self.num_gen)
       
                 
         return individual
         
-    def evaluatePopulation(self):
-     
-        # if __name__ == "Population":
-        #     processes = []
-        #     ret_values = []
-        #     for i in range(0, len(self.individuals)):
-        #         ret_value = multiprocessing.Value("d", self.individuals[i], lock=False)
-        #         p = multiprocessing.Process(target=self.evaluateHelper, args=(ret_value,))
-        #         ret_values.append(ret_value)
-        #         processes.append(p)
-        #         p.start()
-                
-        #     for p in processes:
-        #         p.join()
-                
-        #     for v in ret_values:
-        #         print(v.value)
-            
-                
-        #     p = multiprocessing.Process(target=self.createNewPopulation)
-        #     p.start()
-        #     p.join()
+    def evaluatePopulation(self, num_gen = 1):
+        
+        self.num_gen = num_gen
         vals = Pool().map(self.evaluateHelper, self.individuals) 
     
             
         self.individuals = vals
-        self.createNewPopulation()
-              
-                
-
-       
-            # output = process_pool.starmap(self.evaluateHelper, self.individuals)
-           
-        # for i in range(0, len(self.individuals)):
-        #     print("==============================<><><><>>>>>>>>>>>>>   " + str(i))
-        #     self.individuals[i].evaluateChromosome()
-        #     print("\n")
-        #     print(i)
-        #     print("FINAL FITNESSSSSSSSS: " + str(self.individuals[i].fitness))
-        #     print("\n")
+        self.individuals.sort(key=lambda x: x.fitness, reverse=False)
+        # print("create new pop")
+        # for i in self.individuals:
+        #     print("fit: " + str(i.fitness))
             
-    def createNewPopulation(self):
-        print("create new pop")
-        for i in self.individuals:
-            print("fit: " + str(i.fitness))
+        if self.best_fitness > self.individuals[0].fitness:
+            self.best_fitness = self.individuals[0].fitness
+            self.best_individual = self.individuals[0].copy()
+            print("BEST FITNESS: " + str(self.individuals[0].fitness))
         
+        
+        # for o in self.individuals[0].problems:
+        #     print(len(o.used_objects))
+        #     for s in o.used_objects:
+        #         print(s.shapes)
+            
+        self.createNewPopulation(num_gen)
+              
+        
+    def testSolution(self, num_gen = 1):
+        new_problems = self.manager.returnNProblems(0, 5)
+        self.best_individual.addProblems(new_problems)
+        
+            
+        # self.num_gen = num_gen
+        # vals = Pool().map(self.evaluateHelper, self.individuals) 
+    
+        self.best_individual = self.evaluateHelper(self.best_individual)
+       
+        print("testing pop")
+    
+        print("BEST FITNESS: " + str(self.best_individual.fitness))
+        print("used objects: " + str(len(self.best_individual.used_objects)))
+        for o in self.best_individual.used_objects:
+            print(o.shapes)
+        
+        
+    def createNewPopulation(self, num_gen = 1):
+        
+        # print("create new population")
         new_individuals = []
         index = 0
         while index < len(self.individuals):
@@ -142,3 +149,13 @@ class Population:
                 new_individuals.append(kids[k])
                 
         self.individuals = new_individuals
+        if num_gen % 2 == 0:
+            adder = - 1
+        else:
+            adder = + 1
+        for i in range(0, len(self.individuals)):
+            new_problems = self.manager.returnNProblems(num_gen + adder, (num_gen + adder) + 5)
+           
+            self.individuals[i].addProblems(new_problems)
+        
+            
