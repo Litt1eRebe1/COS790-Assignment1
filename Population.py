@@ -86,6 +86,11 @@ class Population:
         rand_int =  randint(a, b)
         return rand_int
     
+    def evaluateHelperBest(self, individual):
+        individual.evaluateChromosomeBest(self.num_gen)
+        
+        return individual
+    
     def evaluateHelper(self, individual):
         
         individual.evaluateChromosome(self.num_gen)
@@ -108,7 +113,7 @@ class Population:
         if self.best_fitness > self.individuals[0].fitness:
             self.best_fitness = self.individuals[0].fitness
             self.best_individual = self.individuals[0].copy()
-            print("BEST FITNESS: " + str(self.individuals[0].fitness))
+        print("BEST FITNESS: " + str(self.individuals[0].fitness))
         
         
         # for o in self.individuals[0].problems:
@@ -127,7 +132,7 @@ class Population:
         # self.num_gen = num_gen
         # vals = Pool().map(self.evaluateHelper, self.individuals) 
     
-        self.best_individual = self.evaluateHelper(self.best_individual)
+        self.best_individual = self.evaluateHelperBest(self.best_individual)
        
         print("testing pop")
     
@@ -149,12 +154,9 @@ class Population:
                 new_individuals.append(kids[k])
                 
         self.individuals = new_individuals
-        if num_gen % 2 == 0:
-            adder = - 1
-        else:
-            adder = + 1
+       
         for i in range(0, len(self.individuals)):
-            new_problems = self.manager.returnNProblems(num_gen + adder, (num_gen + adder) + 5)
+            new_problems = self.manager.returnNProblems(0, 5)
            
             self.individuals[i].addProblems(new_problems)
         
